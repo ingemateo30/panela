@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Download, FileText, Table } from 'lucide-react'
 import { ReportExporter } from '@/lib/exporters'
-import { useToast } from '@/hooks/use-toast'
+// Cambiar esta línea según la ubicación actual del archivo
+import { useToast } from '@/app/hooks/use-toast'
+// O crear la carpeta hooks en src y usar: import { useToast } from '@/hooks/use-toast'
 
 interface ExportButtonProps {
   data: any[]
@@ -42,6 +44,9 @@ export function ExportButton({ data, filename, type }: ExportButtonProps) {
         case 'insumos':
           reportData = ReportExporter.formatInsumosData(data)
           break
+        case 'ventas':
+          // Implementar formatVentasData cuando sea necesario
+          throw new Error('Formato de ventas no implementado aún')
         default:
           throw new Error('Tipo de reporte no soportado')
       }
