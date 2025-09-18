@@ -58,19 +58,25 @@
   }
 }
 
-/* Estilos personalizados para panela */
-.panela-gradient {
-  background: linear-gradient(135deg, #a67c52 0%, #8d5f3c 100%);
-}
+/* Componentes personalizados para panela usando clases Tailwind válidas */
+@layer components {
+  .panela-gradient {
+    @apply bg-gradient-to-br from-panela-700 to-panela-800;
+  }
 
-.panela-card {
-  @apply bg-white rounded-lg shadow-md border border-panela-200 hover:shadow-lg transition-shadow;
-}
+  .panela-card {
+    @apply bg-white rounded-lg shadow-md border border-panela-200 hover:shadow-lg transition-shadow;
+  }
 
-.panela-input {
-  @apply w-full px-3 py-2 border border-panela-300 rounded-md focus:outline-none focus:ring-2 focus:ring-panela-500 focus:border-transparent;
-}
+  .panela-input {
+    @apply w-full px-3 py-2 border border-panela-300 rounded-md focus:outline-none focus:ring-2 focus:ring-panela-500 focus:border-transparent;
+  }
 
-.panela-button {
-  @apply px-4 py-2 bg-panela-600 text-white rounded-md hover:bg-panela-700 focus:outline-none focus:ring-2 focus:ring-panela-500 focus:ring-offset-2 transition-colors;
+  .panela-button {
+    @apply px-4 py-2 bg-panela-600 text-white rounded-md hover:bg-panela-700 focus:outline-none focus:ring-2 focus:ring-panela-500 focus:ring-offset-2 transition-colors;
+  }
+  
+  .panela-button-secondary {
+    @apply px-4 py-2 bg-panela-100 text-panela-800 border border-panela-300 rounded-md hover:bg-panela-200 focus:outline-none focus:ring-2 focus:ring-panela-500 focus:ring-offset-2 transition-colors;
+  }
 }
