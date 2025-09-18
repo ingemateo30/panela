@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(OPERARIO)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  lotes     Lote[]
+  insumoMovimientos InsumoMovimiento[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  OPERARIO
+}
+
+// Modelo de Proveedor
+model Proveedor {
+  id       String @id @default(cuid())
+  nombre   String
+  contacto String?
+  telefono String?
+  email    String?
+  direccion String?
+  activo   Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  compras  Compra[]
+
+  @@map("proveedores")
+}
+
+// Modelo de Compra a Proveedores
+model Compra {
+  id           String   @id @default(cuid())
+  proveedorId  String
+  cantidad     Float    // en kg
+  precioUnitario Float  // por kg
+  total        Float
+  fecha        DateTime @default(now())
+  observaciones String?
+  
+  // Relaciones
+  proveedor    Proveedor @relation(fields: [proveedorId], references: [id])
+
+  @@map("compras")
+}
+
+// Modelo de Lote de Panela Propia
+model Lote {
+  id          String   @id @default(cuid())
+  codigo      String   @unique // Para el QR
+  cantidad    Float    // en kg
+  fechaProduccion DateTime @default(now())
+  
+  // Costos detallados
+  costoCana     Float
+  costoManoObra Float
+  costoEnergia  Float
+  costoEmpaques Float
+  costoTransporte Float
+  costoTotal    Float
+  
+  // Precio sugerido
+  margenUtilidad Float @default(20) // porcentaje
+  precioSugerido Float
+  
+  // Estado del lote
+  estado      EstadoLote @default(PRODUCCION)
+  
+  // Trazabilidad
+  descripcion String?
+  observaciones String?
+  
+  // Usuario que registró
+  usuarioId   String
+  usuario     User @relation(fields: [usuarioId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  ventas      Venta[]
+
+  @@map("lotes")
+}
+
+enum EstadoLote {
+  PRODUCCION
+  DISPONIBLE
+  VENDIDO
+  CADUCADO
+}
+
+// Modelo de Insumos
+model Insumo {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  descripcion String?
+  unidadMedida String  // unidades, kg, etc.
+  stockMinimo Int      @default(0)
+  stockActual Int      @default(0)
+  costoUnitario Float  @default(0)
+  activo      Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  movimientos InsumoMovimiento[]
+
+  @@map("insumos")
+}
+
+// Modelo de Movimiento de Insumos
+model InsumoMovimiento {
+  id        String   @id @default(cuid())
+  insumoId  String
+  tipo      TipoMovimiento
+  cantidad  Int
+  motivo    String?
+  fecha     DateTime @default(now())
+  
+  // Usuario que realizó el movimiento
+  usuarioId String
+  usuario   User @relation(fields: [usuarioId], references: [id])
+  
+  // Relación con insumo
+  insumo    Insumo @relation(fields: [insumoId], references: [id])
+
+  @@map("insumo_movimientos")
+}
+
+enum TipoMovimiento {
+  ENTRADA
+  SALIDA
+}
+
+// Modelo de Ventas
+model Venta {
+  id           String   @id @default(cuid())
+  loteId       String
+  cantidad     Float    // kg vendidos del lote
+  precioUnitario Float
+  total        Float
+  cliente      String?
+  fecha        DateTime @default(now())
+  observaciones String?
+  
+  // Relación con lote
+  lote         Lote @relation(fields: [loteId], references: [id])
+
+  @@map("ventas")
+}
+
+// Modelo de Configuración del Sistema
+model Configuracion {
+  id    String @id @default(cuid())
+  clave String @unique
+  valor String
+  
+  @@map("configuracion")
+}
