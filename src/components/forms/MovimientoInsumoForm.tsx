@@ -25,13 +25,13 @@ interface MovimientoFormData {
   motivo: string
 }
 
-export function MovimientoInsumoForm({ 
-  insumoId, 
+export function MovimientoInsumoForm({
+  insumoId,
   insumoNombre,
-  stockActual, 
+  stockActual,
   unidadMedida,
   onSuccess,
-  onCancel 
+  onCancel
 }: MovimientoInsumoFormProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -51,13 +51,13 @@ export function MovimientoInsumoForm({
     }))
   }
 
-  const nuevoStock = formData.tipo === 'ENTRADA' 
+  const nuevoStock = formData.tipo === 'ENTRADA'
     ? stockActual + formData.cantidad
     : stockActual - formData.cantidad
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+
     // Validaciones
     if (formData.cantidad <= 0) {
       toast({
@@ -175,3 +175,112 @@ export function MovimientoInsumoForm({
           </div>
 
           {/* Tipo de movimiento */}
+          <div className="space-y-2">
+            <Label>Tipo de Movimiento</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={formData.tipo === 'ENTRADA' ? 'default' : 'outline'}
+                className="w-full"
+                onClick={() => handleInputChange('tipo', 'ENTRADA')}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Entrada
+              </Button>
+              <Button
+                type="button"
+                variant={formData.tipo === 'SALIDA' ? 'default' : 'outline'}
+                className="w-full"
+                onClick={() => handleInputChange('tipo', 'SALIDA')}
+              >
+                <Minus className="h-4 w-4 mr-2" />
+                Salida
+              </Button>
+            </div>
+          </div>
+
+          {/* Cantidad */}
+          <div className="space-y-2">
+            <Label htmlFor="cantidad">Cantidad ({unidadMedida})</Label>
+            <Input
+              id="cantidad"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.cantidad || ''}
+              onChange={(e) => handleInputChange('cantidad', parseFloat(e.target.value) || 0)}
+              required
+            />
+          </div>
+
+          {/* Previsualización nuevo stock */}
+          <div className={`p-3 rounded-md ${nuevoStock < 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+            <div className="flex items-center justify-between text-sm">
+              <span className={`font-medium ${nuevoStock < 0 ? 'text-red-800' : 'text-green-800'}`}>
+                Nuevo stock:
+              </span>
+              <span className={`font-semibold ${nuevoStock < 0 ? 'text-red-900' : 'text-green-900'}`}>
+                {nuevoStock} {unidadMedida}
+                {nuevoStock < 0 && (
+                  <AlertTriangle className="inline h-4 w-4 ml-1" />
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Motivo */}
+          <div className="space-y-2">
+            <Label htmlFor="motivo">Motivo</Label>
+            <Select
+              value={formData.motivo}
+              onValueChange={(value) => handleInputChange('motivo', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccione un motivo" />
+              </SelectTrigger>
+              <SelectContent>
+                {motivosComunes[formData.tipo].map((motivo) => (
+                  <SelectItem key={motivo} value={motivo}>
+                    {motivo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Observaciones adicionales */}
+          <div className="space-y-2">
+            <Label htmlFor="observaciones">Observaciones (opcional)</Label>
+            <Textarea
+              id="observaciones"
+              placeholder="Detalles adicionales del movimiento..."
+              rows={3}
+            />
+          </div>
+
+          {/* Botones */}
+          <div className="flex gap-2 pt-4">
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="flex-1"
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+            )}
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={loading || nuevoStock < 0}
+            >
+              {loading ? 'Registrando...' : 'Registrar Movimiento'}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}

@@ -93,15 +93,23 @@ export async function GET(request: Request) {
       }
     })
 
-    const totalCostos = {
-      cana: lotes.reduce((acc, l) => acc + l.costoCana, 0),
-      manoObra: lotes.reduce((acc, l) => acc + l.costoManoObra, 0),
-      energia: lotes.reduce((acc, l) => acc + l.costoEnergia, 0),
-      empaques: lotes.reduce((acc, l) => acc + l.costoEmpaques, 0),
-      transporte: lotes.reduce((acc, l) => acc + l.costoTransporte, 0)
+    type LoteCosto = {
+      costoCana: number
+      costoManoObra: number
+      costoEnergia: number
+      costoEmpaques: number
+      costoTransporte: number
     }
 
-    const totalGeneral = Object.values(totalCostos).reduce((acc, val) => acc + val, 0)
+    const totalCostos = {
+      cana: lotes.reduce((acc: number, l: LoteCosto) => acc + l.costoCana, 0),
+      manoObra: lotes.reduce((acc: number, l: LoteCosto) => acc + l.costoManoObra, 0),
+      energia: lotes.reduce((acc: number, l: LoteCosto) => acc + l.costoEnergia, 0),
+      empaques: lotes.reduce((acc: number, l: LoteCosto) => acc + l.costoEmpaques, 0),
+      transporte: lotes.reduce((acc: number, l: LoteCosto) => acc + l.costoTransporte, 0)
+    }
+
+    const totalGeneral = Object.values(totalCostos).reduce((acc: number, val: number) => acc + val, 0)
 
     const costosDetallados = [
       { categoria: 'Caña', total: totalCostos.cana, porcentaje: (totalCostos.cana / totalGeneral) * 100 },
@@ -120,7 +128,15 @@ export async function GET(request: Request) {
       }
     })
 
-    const comparativoEstados = estadosLotes.map(e => ({
+    type EstadoLote = {
+      estado: string
+      _sum: {
+        cantidad: number | null
+        costoTotal: number | null
+      }
+    }
+
+    const comparativoEstados = estadosLotes.map((e: EstadoLote) => ({
       estado: e.estado,
       cantidad: e._sum.cantidad || 0,
       valor: e._sum.costoTotal || 0
@@ -186,8 +202,16 @@ export async function GET(request: Request) {
       _count: true
     })
 
+    type ProveedorStat = {
+      proveedorId: string
+      _sum: {
+        total: number | null
+      }
+      _count: number
+    }
+
     const topProveedoresData = await Promise.all(
-      proveedoresStats.map(async (p) => {
+      proveedoresStats.map(async (p: ProveedorStat) => {
         const proveedor = await prisma.proveedor.findUnique({
           where: { id: p.proveedorId },
           select: { nombre: true }
@@ -218,8 +242,16 @@ export async function GET(request: Request) {
       _count: true
     })
 
+    type OperarioStat = {
+      usuarioId: string
+      _sum: {
+        cantidad: number | null
+      }
+      _count: number
+    }
+
     const rendimientoOperarios = await Promise.all(
-      operariosStats.map(async (o) => {
+      operariosStats.map(async (o: OperarioStat) => {
         const usuario = await prisma.user.findUnique({
           where: { id: o.usuarioId },
           select: { name: true }

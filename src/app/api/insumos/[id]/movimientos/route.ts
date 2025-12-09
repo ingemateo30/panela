@@ -13,18 +13,18 @@ const movimientoSchema = z.object({
 })
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 // POST - Crear movimiento de insumo
-export async function POST(request: Request, { params }: RouteParams) {
+export async function POST(request: Request, context: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await context.params
     const body = await request.json()
     const validatedData = movimientoSchema.parse(body)
 

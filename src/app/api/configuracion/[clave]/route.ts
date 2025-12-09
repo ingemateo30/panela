@@ -4,18 +4,18 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 interface RouteParams {
-  params: { clave: string }
+  params: Promise<{ clave: string }>
 }
 
 // GET - Obtener configuración por clave
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(request: Request, context: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const { clave } = params
+    const { clave } = await context.params
     
     const configuracion = await prisma.configuracion.findUnique({
       where: { clave }
@@ -39,12 +39,12 @@ export async function GET(request: Request, { params }: RouteParams) {
 }
 
 // PUT - Actualizar configuración
-export async function PUT(request: Request, { params }: RouteParams) {
+export async function PUT(request: Request, context: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
- 
 
-    const { clave } = params
+
+    const { clave } = await context.params
     const body = await request.json()
     const { valor } = body
 

@@ -173,10 +173,11 @@ function LoteCard({ lote }: { lote: Lote }) {
 export default async function LotesPage({
     searchParams
 }: {
-    searchParams: SearchParams
+    searchParams: Promise<SearchParams>
 }) {
     const session = await getServerSession(authOptions)
-    const { lotes, pagination } = await getLotes(searchParams)
+    const resolvedSearchParams = await searchParams
+    const { lotes, pagination } = await getLotes(resolvedSearchParams)
 
     return (
         <div className="space-y-6">

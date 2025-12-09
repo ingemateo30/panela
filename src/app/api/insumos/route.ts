@@ -88,7 +88,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
           tipo: 'ENTRADA',
           cantidad: validatedData.stockActual,
           motivo: 'Stock inicial',
-          usuarioId: session.user.id
+          usuarioId: (session.user as any).id
         }
       })
     }
