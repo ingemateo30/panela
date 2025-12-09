@@ -32,9 +32,14 @@ export async function GET(request: Request) {
     // Obtener todas las configuraciones
     const configs = await prisma.configuracion.findMany()
 
+    type Config = {
+      clave: string
+      valor: string
+    }
+
     // Convertir a objeto
     const configObj: any = {}
-    configs.forEach(config => {
+    configs.forEach((config: Config) => {
       // Intentar parsear valores JSON
       try {
         configObj[config.clave] = JSON.parse(config.valor)

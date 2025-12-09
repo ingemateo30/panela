@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Download, FileText, Table, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { ReportExporter } from '@/lib/exporters'
 
 // Interfaces para los diferentes tipos de datos
 interface Lote {
@@ -297,13 +298,13 @@ export function ExportButton({ data, filename, type, buttonText = 'Exportar', bu
 
       switch (type) {
         case 'lotes':
-          reportData = ReportExporter.formatLotesData(data)
+          reportData = ReportExporter.formatLotesData(data as any)
           break
         case 'proveedores':
-          reportData = ReportExporter.formatProveedoresData(data)
+          reportData = ReportExporter.formatProveedoresData(data as any)
           break
         case 'insumos':
-          reportData = ReportExporter.formatInsumosData(data)
+          reportData = ReportExporter.formatInsumosData(data as any)
           break
         case 'ventas':
           // Implementar formatVentasData cuando sea necesario

@@ -29,6 +29,7 @@ interface CompraFormData {
 
 interface RouteParams {
   id: string
+  [key: string]: string
 }
 
 export default function ComprarPage() {

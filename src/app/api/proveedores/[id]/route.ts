@@ -17,7 +17,7 @@ const proveedorSchema = z.object({
 // PUT - Actualizar proveedor
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -27,6 +27,8 @@ export async function PUT(
 
     const body = await request.json()
     const validatedData = proveedorSchema.parse(body)
+
+    const params = await context.params
 
     // Verificar que el proveedor existe
     const existingProveedor = await prisma.proveedor.findUnique({
@@ -80,13 +82,15 @@ export async function PUT(
 // DELETE - Eliminar proveedor
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const params = await context.params
 
     // Verificar que el proveedor existe
     const existingProveedor = await prisma.proveedor.findUnique({
