@@ -60,9 +60,9 @@ async function getProveedores(searchParams: SearchParams) {
     prisma.proveedor.count({ where })
   ])
 
-  // Calcular estadísticas para cada proveedor
+  // Calcular estadÃ­sticas para cada proveedor
   const proveedoresConStats = await Promise.all(
-    proveedores.map(async (proveedor) => {
+    proveedores.map(async (proveedor: typeof proveedores[0]) => {
       const stats = await prisma.compra.aggregate({
         where: { proveedorId: proveedor.id },
         _sum: {
@@ -111,7 +111,7 @@ function ProveedorCard({ proveedor }: { proveedor: any }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Información de contacto */}
+        {/* InformaciÃ³n de contacto */}
         <div className="space-y-2 pb-4 border-b">
           {proveedor.telefono && (
             <div className="flex items-center text-sm text-gray-600">
@@ -133,7 +133,7 @@ function ProveedorCard({ proveedor }: { proveedor: any }) {
           )}
         </div>
 
-        {/* Estadísticas */}
+        {/* EstadÃ­sticas */}
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-xs text-gray-600">Compras</p>
@@ -151,10 +151,10 @@ function ProveedorCard({ proveedor }: { proveedor: any }) {
           </div>
         </div>
 
-        {/* Últimas compras */}
+        {/* Ãšltimas compras */}
         {proveedor.compras && proveedor.compras.length > 0 && (
           <div className="pt-4 border-t">
-            <p className="text-sm font-medium text-gray-700 mb-2">Últimas compras</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">Ãšltimas compras</p>
             <div className="space-y-1">
               {proveedor.compras.slice(0, 3).map((compra: any) => (
                 <div key={compra.id} className="flex justify-between text-xs text-gray-600">
@@ -212,12 +212,13 @@ function ProveedorCard({ proveedor }: { proveedor: any }) {
 export default async function ProveedoresPage({
   searchParams
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
   const session = await getServerSession(authOptions)
-  const data = await getProveedores(searchParams)
+  const params = await searchParams
+  const data = await getProveedores(params)
 
-  // Estadísticas generales
+  // EstadÃ­sticas generales
   const statsGenerales = await prisma.proveedor.aggregate({
     _count: true,
     where: { activo: true }
@@ -302,7 +303,7 @@ export default async function ProveedoresPage({
         <Card className="md:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Inversión Total
+              InversiÃ³n Total
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -326,11 +327,11 @@ export default async function ProveedoresPage({
             <div className="flex-1">
               <Input
                 placeholder="Buscar por nombre, contacto o email..."
-                defaultValue={searchParams.search}
+                defaultValue={params.search}
                 name="search"
               />
             </div>
-            <Select defaultValue={searchParams.activo || 'all'}>
+            <Select defaultValue={params.activo || 'all'}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
@@ -379,13 +380,13 @@ export default async function ProveedoresPage({
             ))}
           </div>
 
-          {/* Paginación */}
+          {/* PaginaciÃ³n */}
           {data.pagination.totalPages > 1 && (
             <div className="flex justify-center gap-2">
               {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map((page) => (
                 <Link
                   key={page}
-                  href={`/proveedores?page=${page}${searchParams.search ? `&search=${searchParams.search}` : ''}${searchParams.activo ? `&activo=${searchParams.activo}` : ''}`}
+                  href={`/proveedores?page=${page}${params.search ? `&search=${params.search}` : ''}${params.activo ? `&activo=${params.activo}` : ''}`}
                 >
                   <Button
                     variant={page === data.pagination.page ? 'default' : 'outline'}

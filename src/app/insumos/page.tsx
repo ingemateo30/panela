@@ -135,3 +135,62 @@ function InsumoCard({ insumo }: { insumo: any}) {
     </Card>
   )
 }
+
+export default async function InsumosPage({
+  searchParams
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const params = await searchParams
+  const data = await getInsumos(params)
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Insumos</h1>
+          <p className="text-gray-600">Gestiona el inventario de insumos</p>
+        </div>
+        <div className="flex gap-2">
+          <ExportButton
+            data={data.insumos}
+            filename="insumos"
+            type="insumos"
+          />
+          <Button asChild>
+            <Link href="/insumos/nuevo">
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Insumo
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {data.insumos.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No hay insumos registrados
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Comienza agregando tu primer insumo
+            </p>
+            <Button asChild>
+              <Link href="/insumos/nuevo">
+                <Plus className="h-4 w-4 mr-2" />
+                Crear Primer Insumo
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {data.insumos.map((insumo: any) => (
+            <InsumoCard key={insumo.id} insumo={insumo} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

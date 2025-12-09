@@ -112,14 +112,15 @@ export async function POST(request: Request) {
     })
 
     // Si hay stock inicial, crear movimiento de entrada
-    if (validatedData.stockActual > 0) {
+    const userId = (session.user as any)?.id
+    if (validatedData.stockActual > 0 && userId) {
       await prisma.insumoMovimiento.create({
         data: {
           insumoId: insumo.id,
           tipo: 'ENTRADA',
           cantidad: validatedData.stockActual,
           motivo: 'Stock inicial',
-          usuarioId: session.user.id
+          usuarioId: userId
         }
       })
     }

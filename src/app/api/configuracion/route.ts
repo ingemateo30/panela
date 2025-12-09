@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 
     // Convertir a objeto
     const configObj: any = {}
-    configs.forEach(config => {
+    configs.forEach((config: typeof configs[0]) => {
       // Intentar parsear valores JSON
       try {
         configObj[config.clave] = JSON.parse(config.valor)

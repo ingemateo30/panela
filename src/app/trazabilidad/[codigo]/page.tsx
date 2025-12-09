@@ -38,12 +38,13 @@ async function getLoteByCode(codigo: string): Promise<Lote | null> {
   return null
 }
 
-export default async function TrazabilidadPage({ 
-  params 
-}: { 
-  params: { codigo: string } 
+export default async function TrazabilidadPage({
+  params
+}: {
+  params: Promise<{ codigo: string }>
 }) {
-  const lote = await getLoteByCode(params.codigo)
+  const { codigo } = await params
+  const lote = await getLoteByCode(codigo)
 
   if (!lote) {
     return (
@@ -54,7 +55,7 @@ export default async function TrazabilidadPage({
             Lote no encontrado
           </h1>
           <p className="text-gray-600">
-            No se encontró información para el código: {params.codigo}
+            No se encontró información para el código: {codigo}
           </p>
         </div>
       </div>

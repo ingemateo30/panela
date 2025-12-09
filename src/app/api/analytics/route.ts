@@ -94,14 +94,14 @@ export async function GET(request: Request) {
     })
 
     const totalCostos = {
-      cana: lotes.reduce((acc, l) => acc + l.costoCana, 0),
-      manoObra: lotes.reduce((acc, l) => acc + l.costoManoObra, 0),
-      energia: lotes.reduce((acc, l) => acc + l.costoEnergia, 0),
-      empaques: lotes.reduce((acc, l) => acc + l.costoEmpaques, 0),
-      transporte: lotes.reduce((acc, l) => acc + l.costoTransporte, 0)
+      cana: lotes.reduce((acc: number, l: typeof lotes[0]) => acc + l.costoCana, 0),
+      manoObra: lotes.reduce((acc: number, l: typeof lotes[0]) => acc + l.costoManoObra, 0),
+      energia: lotes.reduce((acc: number, l: typeof lotes[0]) => acc + l.costoEnergia, 0),
+      empaques: lotes.reduce((acc: number, l: typeof lotes[0]) => acc + l.costoEmpaques, 0),
+      transporte: lotes.reduce((acc: number, l: typeof lotes[0]) => acc + l.costoTransporte, 0)
     }
 
-    const totalGeneral = Object.values(totalCostos).reduce((acc, val) => acc + val, 0)
+    const totalGeneral = Object.values(totalCostos).reduce((acc: number, val) => acc + val, 0)
 
     const costosDetallados = [
       { categoria: 'Caña', total: totalCostos.cana, porcentaje: (totalCostos.cana / totalGeneral) * 100 },
@@ -120,7 +120,7 @@ export async function GET(request: Request) {
       }
     })
 
-    const comparativoEstados = estadosLotes.map(e => ({
+    const comparativoEstados = estadosLotes.map((e: typeof estadosLotes[0]) => ({
       estado: e.estado,
       cantidad: e._sum.cantidad || 0,
       valor: e._sum.costoTotal || 0
@@ -187,7 +187,7 @@ export async function GET(request: Request) {
     })
 
     const topProveedoresData = await Promise.all(
-      proveedoresStats.map(async (p) => {
+      proveedoresStats.map(async (p: typeof proveedoresStats[0]) => {
         const proveedor = await prisma.proveedor.findUnique({
           where: { id: p.proveedorId },
           select: { nombre: true }
@@ -219,7 +219,7 @@ export async function GET(request: Request) {
     })
 
     const rendimientoOperarios = await Promise.all(
-      operariosStats.map(async (o) => {
+      operariosStats.map(async (o: typeof operariosStats[0]) => {
         const usuario = await prisma.user.findUnique({
           where: { id: o.usuarioId },
           select: { name: true }

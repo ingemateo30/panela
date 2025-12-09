@@ -186,10 +186,10 @@ async function getProduccionStats() {
       total: ventasMesActual._sum.total || 0
     },
     eficienciaVentas,
-    estadisticasPorUsuario: estadisticasPorUsuario.map(user => ({
+    estadisticasPorUsuario: estadisticasPorUsuario.map((user: typeof estadisticasPorUsuario[0]) => ({
       ...user,
-      totalCantidad: user.lotes.reduce((acc, l) => acc + l.cantidad, 0),
-      totalCosto: user.lotes.reduce((acc, l) => acc + l.costoTotal, 0)
+      totalCantidad: user.lotes.reduce((acc: number, l: any) => acc + l.cantidad, 0),
+      totalCosto: user.lotes.reduce((acc: number, l: any) => acc + l.costoTotal, 0)
     })),
     ultimosMeses,
     lotesRecientes
@@ -372,7 +372,7 @@ export default async function ProduccionPage() {
                   No hay datos de producción por operario
                 </p>
               ) : (
-                stats.estadisticasPorUsuario.map((user) => (
+                stats.estadisticasPorUsuario.map((user: any) => (
                   <div key={user.id} className="flex items-center justify-between border-b pb-3 last:border-0">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-panela-100 flex items-center justify-center mr-3">
@@ -427,7 +427,7 @@ export default async function ProduccionPage() {
                 </tr>
               </thead>
               <tbody>
-                {stats.lotesRecientes.map((lote) => (
+                {stats.lotesRecientes.map((lote: any) => (
                   <tr key={lote.id} className="border-b last:border-0 hover:bg-gray-50">
                     <td className="py-3 px-4">
                       <Link href={`/trazabilidad/${lote.codigo}`} className="text-panela-600 hover:underline font-mono">

@@ -137,12 +137,12 @@ async function getReportesData() {
   ])
 
   // Calcular estadísticas
-  const totalProduccionKg = lotesData.reduce((acc, lote) => acc + lote.cantidad, 0)
-  const totalCostoProduccion = lotesData.reduce((acc, lote) => acc + lote.costoTotal, 0)
-  const totalVentasKg = ventasData.reduce((acc, venta) => acc + venta.cantidad, 0)
-  const totalIngresos = ventasData.reduce((acc, venta) => acc + venta.total, 0)
-  const totalComprasKg = comprasData.reduce((acc, compra) => acc + compra.cantidad, 0)
-  const totalGastoCompras = comprasData.reduce((acc, compra) => acc + compra.total, 0)
+  const totalProduccionKg = lotesData.reduce((acc: number, lote: any) => acc + lote.cantidad, 0)
+  const totalCostoProduccion = lotesData.reduce((acc: number, lote: any) => acc + lote.costoTotal, 0)
+  const totalVentasKg = ventasData.reduce((acc: number, venta: any) => acc + venta.cantidad, 0)
+  const totalIngresos = ventasData.reduce((acc: number, venta: any) => acc + venta.total, 0)
+  const totalComprasKg = comprasData.reduce((acc: number, compra: any) => acc + compra.cantidad, 0)
+  const totalGastoCompras = comprasData.reduce((acc: number, compra: any) => acc + compra.total, 0)
 
   // Calcular variaciones con mes anterior
   const variacionProduccion = lotesDataMesAnterior._count > 0
@@ -192,7 +192,7 @@ function ReportCard({
   title: string
   description: string
   icon: any
-  reportType: string
+  reportType: 'compras' | 'insumos' | 'lotes' | 'proveedores' | 'ventas'
   data: any[]
   color?: string
 }) {
@@ -404,7 +404,7 @@ export default async function ReportesPage() {
               Hay {data.insumosLowStock.length} insumo(s) con stock bajo el mínimo:
             </p>
             <div className="space-y-2">
-              {data.insumosLowStock.slice(0, 5).map((insumo) => (
+              {data.insumosLowStock.slice(0, 5).map((insumo: any) => (
                 <div key={insumo.id} className="flex justify-between items-center bg-white p-2 rounded">
                   <span className="font-medium text-gray-900">{insumo.nombre}</span>
                   <span className="text-sm text-red-600">
