@@ -12,10 +12,12 @@ import { useToast } from '@/app/hooks/use-toast'
 interface ExportButtonProps {
   data: any[]
   filename: string
-  type: 'lotes' | 'proveedores' | 'insumos' | 'ventas'
+  type: 'lotes' | 'proveedores' | 'insumos' | 'ventas' | 'compras'
+  buttonText?: string
+  buttonSize?: 'default' | 'sm' | 'lg' | 'icon'
 }
 
-export function ExportButton({ data, filename, type }: ExportButtonProps) {
+export function ExportButton({ data, filename, type, buttonText = 'Exportar', buttonSize = 'default' }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false)
   const { toast } = useToast()
 
@@ -45,8 +47,11 @@ export function ExportButton({ data, filename, type }: ExportButtonProps) {
           reportData = ReportExporter.formatInsumosData(data)
           break
         case 'ventas':
-          // Implementar formatVentasData cuando sea necesario
-          throw new Error('Formato de ventas no implementado aún')
+          reportData = ReportExporter.formatVentasData(data)
+          break
+        case 'compras':
+          reportData = ReportExporter.formatComprasData(data)
+          break
         default:
           throw new Error('Tipo de reporte no soportado')
       }
@@ -76,9 +81,9 @@ export function ExportButton({ data, filename, type }: ExportButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={isExporting || data.length === 0}>
+        <Button variant="outline" size={buttonSize} disabled={isExporting || data.length === 0}>
           <Download className="h-4 w-4 mr-2" />
-          {isExporting ? 'Exportando...' : 'Exportar'}
+          {isExporting ? 'Exportando...' : buttonText}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

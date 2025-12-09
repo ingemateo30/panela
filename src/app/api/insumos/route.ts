@@ -119,7 +119,7 @@ export async function POST(request: Request) {
           tipo: 'ENTRADA',
           cantidad: validatedData.stockActual,
           motivo: 'Stock inicial',
-          
+          usuarioId: session.user.id
         }
       })
     }
