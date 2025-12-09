@@ -42,6 +42,30 @@ interface Insumo {
   stockMinimo: number
 }
 
+interface Venta {
+  id: string
+  fecha: Date
+  cantidad: number
+  precioUnitario: number
+  total: number
+  cliente?: string
+  lote?: {
+    codigo: string
+  }
+}
+
+interface Compra {
+  id: string
+  fecha: Date
+  cantidad: number
+  precioUnitario: number
+  total: number
+  observaciones?: string
+  proveedor?: {
+    nombre: string
+  }
+}
+
 export class ReportExporter {
   static formatLotesData(lotes: Lote[]): ReportData {
     return {
@@ -87,6 +111,38 @@ export class ReportExporter {
         insumo.stockMinimo.toString()
       ]),
       filename: `insumos_${format(new Date(), 'yyyy-MM-dd')}`
+    }
+  }
+
+  static formatVentasData(ventas: Venta[]): ReportData {
+    return {
+      title: 'Reporte de Ventas',
+      headers: ['Fecha', 'Lote', 'Cliente', 'Cantidad (kg)', 'Precio Unitario', 'Total'],
+      rows: ventas.map(venta => [
+        format(new Date(venta.fecha), 'dd/MM/yyyy', { locale: es }),
+        venta.lote?.codigo || 'N/A',
+        venta.cliente || 'Sin cliente',
+        venta.cantidad.toFixed(2),
+        `$${venta.precioUnitario.toLocaleString('es-CO')}`,
+        `$${venta.total.toLocaleString('es-CO')}`
+      ]),
+      filename: `ventas_${format(new Date(), 'yyyy-MM-dd')}`
+    }
+  }
+
+  static formatComprasData(compras: Compra[]): ReportData {
+    return {
+      title: 'Reporte de Compras',
+      headers: ['Fecha', 'Proveedor', 'Cantidad (kg)', 'Precio Unitario', 'Total', 'Observaciones'],
+      rows: compras.map(compra => [
+        format(new Date(compra.fecha), 'dd/MM/yyyy', { locale: es }),
+        compra.proveedor?.nombre || 'N/A',
+        compra.cantidad.toFixed(2),
+        `$${compra.precioUnitario.toLocaleString('es-CO')}`,
+        `$${compra.total.toLocaleString('es-CO')}`,
+        compra.observaciones || '-'
+      ]),
+      filename: `compras_${format(new Date(), 'yyyy-MM-dd')}`
     }
   }
 
