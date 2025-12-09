@@ -57,7 +57,9 @@ type ExportData = Lote | Proveedor | Insumo | Venta
 interface ExportButtonProps {
   data: ExportData[]
   filename: string
-  type: 'lotes' | 'proveedores' | 'insumos' | 'ventas'
+  type: 'lotes' | 'proveedores' | 'insumos' | 'ventas' | 'compras'
+  buttonText?: string
+  buttonSize?: 'default' | 'sm' | 'lg' | 'icon'
 }
 
 interface ReportData {
@@ -67,7 +69,7 @@ interface ReportData {
   filename: string
 }
 
-export function ExportButton({ data, filename, type }: ExportButtonProps) {
+export function ExportButton({ data, filename, type, buttonText = 'Exportar', buttonSize = 'default' }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false)
   const { toast } = useToast()
 
@@ -291,7 +293,24 @@ export function ExportButton({ data, filename, type }: ExportButtonProps) {
     setIsExporting(true)
 
     try {
-      const reportData = getReportData()
+      let reportData
+
+      switch (type) {
+        case 'lotes':
+          reportData = ReportExporter.formatLotesData(data)
+          break
+        case 'proveedores':
+          reportData = ReportExporter.formatProveedoresData(data)
+          break
+        case 'insumos':
+          reportData = ReportExporter.formatInsumosData(data)
+          break
+        case 'ventas':
+          // Implementar formatVentasData cuando sea necesario
+          throw new Error('Formato de ventas no implementado aún')
+        default:
+          throw new Error('Tipo de reporte no soportado')
+      }
 
       if (format === 'pdf') {
         await exportToPDF(reportData)
@@ -318,22 +337,9 @@ export function ExportButton({ data, filename, type }: ExportButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          disabled={isExporting || data.length === 0}
-          className="min-w-[120px]"
-        >
-          {isExporting ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Exportando...
-            </>
-          ) : (
-            <>
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
-            </>
-          )}
+        <Button variant="outline" disabled={isExporting || data.length === 0}>
+          <Download className="h-4 w-4 mr-2" />
+          {isExporting ? 'Exportando...' : 'Exportar'}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
