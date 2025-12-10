@@ -232,7 +232,7 @@ export default async function LotesPage({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">
-                            
+                            {lotes.filter((l: Lote) => l.estado === 'DISPONIBLE').length}
                         </div>
                     </CardContent>
                 </Card>

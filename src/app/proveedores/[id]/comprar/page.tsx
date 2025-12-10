@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { ArrowLeft, Save, Calculator, ShoppingCart, User, Phone, Mail } from 'lucide-react'
 
 interface Proveedor {

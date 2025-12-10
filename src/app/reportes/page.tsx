@@ -84,12 +84,13 @@ async function getReportesData() {
     }),
 
     // Insumos con stock bajo
+    // Insumos con stock bajo
     prisma.insumo.findMany({
       where: {
-        activo: true,
-        stockActual: { lte: prisma.insumo.fields.stockMinimo }
+        activo: true
       }
-    }),
+    }).then(insumos => insumos.filter(i => i.stockActual <= i.stockMinimo)),
+
 
     // Proveedores activos
     prisma.proveedor.findMany({

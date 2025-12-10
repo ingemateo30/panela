@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ExportButton } from '@/components/ui/export-button'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { Plus, Search, Package, AlertTriangle, Edit, Eye } from 'lucide-react'
 
 interface Insumo {

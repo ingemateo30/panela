@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { ArrowLeft, Save, User, Mail, Phone, MapPin } from 'lucide-react'
 
 interface ProveedorFormData {
