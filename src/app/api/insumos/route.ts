@@ -43,7 +43,21 @@ export async function GET(request: Request) {
     }
 
     // Obtener todos los insumos que coincidan con el filtro base
-    let insumos = await prisma.insumo.findMany({
+    type InsumoWithMovimientos = Prisma.InsumoGetPayload<{
+      include: {
+        movimientos: {
+          select: {
+            id: true,
+            tipo: true,
+            cantidad: true,
+            fecha: true,
+            motivo: true
+          }
+        }
+      }
+    }>
+
+    let insumos: InsumoWithMovimientos[] = await prisma.insumo.findMany({
       where,
       include: {
         movimientos: {
@@ -63,7 +77,7 @@ export async function GET(request: Request) {
 
     // Filtrar por stock bajo en memoria (Prisma no permite comparar dos campos)
     if (lowStock) {
-      insumos = insumos.filter(insumo => insumo.stockActual <= insumo.stockMinimo)
+      insumos = insumos.filter((insumo: InsumoWithMovimientos) => insumo.stockActual <= insumo.stockMinimo)
     }
 
     // Aplicar paginación en memoria
