@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
+import { TipoMovimiento } from '@/types/prisma'
 
 // Esquema de validación para insumos
 const insumoSchema = z.object({
@@ -30,44 +32,46 @@ export async function GET(request: Request) {
     const activo = searchParams.get('activo')
     const lowStock = searchParams.get('lowStock') === 'true'
 
-    const where = {
+    const where: Prisma.InsumoWhereInput = {
       ...(search && {
         OR: [
           { nombre: { contains: search } },
           { descripcion: { contains: search } }
         ]
       }),
-      ...(activo !== null && activo !== '' && { activo: activo === 'true' }),
-      ...(lowStock && {
-        stockActual: { lte: prisma.insumo.fields.stockMinimo }
-      })
+      ...(activo !== null && activo !== '' && { activo: activo === 'true' })
     }
 
-    const [insumos, total] = await Promise.all([
-      prisma.insumo.findMany({
-        where,
-        include: {
-          movimientos: {
-            select: {
-              id: true,
-              tipo: true,
-              cantidad: true,
-              fecha: true,
-              motivo: true
-            },
-            orderBy: { fecha: 'desc' },
-            take: 5
-          }
-        },
-        orderBy: { nombre: 'asc' },
-        skip: (page - 1) * limit,
-        take: limit
-      }),
-      prisma.insumo.count({ where })
-    ])
+    // Obtener todos los insumos que coincidan con el filtro base
+    let insumos = await prisma.insumo.findMany({
+      where,
+      include: {
+        movimientos: {
+          select: {
+            id: true,
+            tipo: true,
+            cantidad: true,
+            fecha: true,
+            motivo: true
+          },
+          orderBy: { fecha: 'desc' },
+          take: 5
+        }
+      },
+      orderBy: { nombre: 'asc' }
+    })
+
+    // Filtrar por stock bajo en memoria (Prisma no permite comparar dos campos)
+    if (lowStock) {
+      insumos = insumos.filter(insumo => insumo.stockActual <= insumo.stockMinimo)
+    }
+
+    // Aplicar paginación en memoria
+    const total = insumos.length
+    const paginatedInsumos = insumos.slice((page - 1) * limit, page * limit)
 
     return NextResponse.json({
-      insumos,
+      insumos: paginatedInsumos,
       pagination: {
         page,
         limit,
@@ -116,7 +120,7 @@ export async function POST(request: Request) {
       await prisma.insumoMovimiento.create({
         data: {
           insumoId: insumo.id,
-          tipo: 'ENTRADA',
+          tipo: TipoMovimiento.ENTRADA,
           cantidad: validatedData.stockActual,
           motivo: 'Stock inicial',
           usuarioId: (session.user as any).id
