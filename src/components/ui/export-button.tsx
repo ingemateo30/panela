@@ -27,7 +27,12 @@ interface Proveedor {
   email?: string | null
   direccion?: string | null
   activo: boolean
-  createdAt: string
+  createdAt: string | Date
+  updatedAt?: string | Date
+  compras?: unknown[]
+  totalCompras?: number
+  totalCantidad?: number
+  totalGastado?: number
 }
 
 interface Insumo {

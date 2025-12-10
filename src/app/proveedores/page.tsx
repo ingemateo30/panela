@@ -14,11 +14,22 @@ import { Plus, Users, Phone, Mail, MapPin, TrendingUp, ShoppingCart, DollarSign 
 import { formatCurrency } from '@/lib/utils'
 import { ProveedorForm } from '@/components/forms/ProveedorForm'
 import { CompraForm } from '@/components/forms/CompraForm'
+import { Proveedor, Compra } from '@/types/prisma'
 
 interface SearchParams {
   page?: string
   search?: string
   activo?: string
+}
+
+type ProveedorConCompras = Proveedor & {
+  compras: Pick<Compra, 'id' | 'cantidad' | 'total' | 'fecha'>[]
+}
+
+type ProveedorWithStats = ProveedorConCompras & {
+  totalCompras: number
+  totalCantidad: number
+  totalGastado: number
 }
 
 async function getProveedores(searchParams: SearchParams) {
@@ -61,8 +72,8 @@ async function getProveedores(searchParams: SearchParams) {
   ])
 
   // Calcular estadísticas para cada proveedor
-  const proveedoresConStats = await Promise.all(
-    proveedores.map(async (proveedor: any) => {
+  const proveedoresConStats: ProveedorWithStats[] = await Promise.all(
+    proveedores.map(async (proveedor: ProveedorConCompras) => {
       const stats = await prisma.compra.aggregate({
         where: { proveedorId: proveedor.id },
         _sum: {
@@ -92,7 +103,7 @@ async function getProveedores(searchParams: SearchParams) {
   }
 }
 
-function ProveedorCard({ proveedor }: { proveedor: any }) {
+function ProveedorCard({ proveedor }: { proveedor: ProveedorWithStats }) {
   return (
     <Card className={`${!proveedor.activo ? 'opacity-60' : ''}`}>
       <CardHeader className="pb-3">
@@ -375,7 +386,7 @@ export default async function ProveedoresPage({
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.proveedores.map((proveedor) => (
+            {data.proveedores.map((proveedor: ProveedorWithStats) => (
               <ProveedorCard key={proveedor.id} proveedor={proveedor} />
             ))}
           </div>
