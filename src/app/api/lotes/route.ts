@@ -116,7 +116,8 @@ export async function POST(request: Request) {
       data: {
         ...validatedData,
         codigo: codigoFinal,
-        estado: 'PRODUCCION'
+        estado: 'PRODUCCION',
+        usuarioId: (session.user as any).id
       },
       include: {
         usuario: {

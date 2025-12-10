@@ -60,10 +60,10 @@ export async function POST(request: Request, context: RouteParams) {
       prisma.insumoMovimiento.create({
         data: {
           insumoId: id,
+          usuarioId: (session.user as any).id,
           tipo: validatedData.tipo,
           cantidad: validatedData.cantidad,
           motivo: validatedData.motivo,
-
         },
         include: {
           usuario: {
