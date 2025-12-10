@@ -210,6 +210,12 @@ export async function GET(request: Request) {
       _count: number
     }
 
+    type TopProveedorData = {
+      nombre: string
+      compras: number
+      total: number
+    }
+
     const topProveedoresData = await Promise.all(
       proveedoresStats.map(async (p: ProveedorStat) => {
         const proveedor = await prisma.proveedor.findUnique({
@@ -225,7 +231,7 @@ export async function GET(request: Request) {
     )
 
     const topProveedores = topProveedoresData
-      .sort((a, b) => b.total - a.total)
+      .sort((a: TopProveedorData, b: TopProveedorData) => b.total - a.total)
       .slice(0, 10)
 
     // 7. Rendimiento de Operarios

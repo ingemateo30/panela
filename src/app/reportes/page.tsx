@@ -20,6 +20,7 @@ import { formatCurrency } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ExportButton } from '@/components/ui/export-button'
+import { Insumo } from '@/types/prisma'
 
 async function getReportesData() {
   const now = new Date()
@@ -89,7 +90,7 @@ async function getReportesData() {
       where: {
         activo: true
       }
-    }).then(insumos => insumos.filter(i => i.stockActual <= i.stockMinimo)),
+    }).then((insumos: Insumo[]) => insumos.filter((i: Insumo) => i.stockActual <= i.stockMinimo)),
 
 
     // Proveedores activos
