@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { EstadoLote } from '@/types/prisma'
 
 // Esquema de validación para lotes
 const loteSchema = z.object({
@@ -33,7 +34,12 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const search = searchParams.get('search') || ''
-    const estado = searchParams.get('estado')
+    const estadoParam = searchParams.get('estado')
+
+    // Validar que el estado sea un valor válido del enum
+    const estadoValido = estadoParam && Object.values(EstadoLote).includes(estadoParam as EstadoLote)
+      ? (estadoParam as EstadoLote)
+      : undefined
 
     const where = {
       ...(search && {
@@ -42,7 +48,7 @@ export async function GET(request: Request) {
           { descripcion: { contains: search } }
         ]
       }),
-      ...(estado && { estado })
+      ...(estadoValido && { estado: estadoValido })
     }
 
     const [lotes, total] = await Promise.all([
