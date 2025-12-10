@@ -12,19 +12,14 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { LotesFilters } from '@/components/lotes/lotes-filters'
 import { ExportButton } from '@/components/ui/export-button'
+import { EstadoLote } from '@/types/prisma'
+import { Prisma } from '@prisma/client'
 
 interface SearchParams {
     estado?: string
     fechaDesde?: string
     fechaHasta?: string
     page?: string
-}
-interface Where {
-    estado?: string;
-    fechaProduccion?: {
-        gte?: Date;
-        lte?: Date;
-    };
 }
 
 interface Lote {
@@ -49,9 +44,14 @@ async function getLotes(searchParams: SearchParams) {
     const limit = 12
     const skip = (page - 1) * limit
 
-    const where: Where = {};
+    const where: Prisma.LoteWhereInput = {};
+
+    // Validar que el estado sea un valor válido del enum
     if (searchParams.estado && searchParams.estado !== 'todos') {
-        where.estado = searchParams.estado
+        const estadoValido = Object.values(EstadoLote).includes(searchParams.estado as EstadoLote)
+        if (estadoValido) {
+            where.estado = searchParams.estado as EstadoLote
+        }
     }
 
     if (searchParams.fechaDesde) {

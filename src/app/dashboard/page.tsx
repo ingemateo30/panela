@@ -10,6 +10,7 @@ import { SalesChart } from '@/components/charts/sales-chart'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { ComponentType } from 'react';
 import { ElementType } from 'react';
+import { EstadoLote } from '@/types/prisma'
 
 async function getDashboardStats() {
   const [
@@ -17,7 +18,7 @@ async function getDashboardStats() {
     totalProveedores,
     insumosCount,
     lotesDisponibles,
-    insumosLowStock,
+    allInsumos,
     totalInventoryValue,
     recentLotes,
     recentCompras
@@ -25,18 +26,15 @@ async function getDashboardStats() {
     prisma.lote.count(),
     prisma.proveedor.count({ where: { activo: true } }),
     prisma.insumo.count({ where: { activo: true } }),
-    prisma.lote.count({ where: { estado: 'DISPONIBLE' } }),
-    prisma.insumo.count({
-      where: {
-        AND: [
-          { activo: true },
-          { stockActual: { lte: prisma.insumo.fields.stockMinimo } }
-        ]
-      }
+    prisma.lote.count({ where: { estado: EstadoLote.DISPONIBLE } }),
+    // Obtener todos los insumos activos para filtrar en memoria
+    prisma.insumo.findMany({
+      where: { activo: true },
+      select: { stockActual: true, stockMinimo: true }
     }),
     prisma.lote.aggregate({
       _sum: { costoTotal: true },
-      where: { estado: 'DISPONIBLE' }
+      where: { estado: EstadoLote.DISPONIBLE }
     }),
     prisma.lote.findMany({
       take: 5,
@@ -49,6 +47,11 @@ async function getDashboardStats() {
       include: { proveedor: { select: { nombre: true } } }
     })
   ])
+
+  // Filtrar insumos con stock bajo en memoria
+  const insumosLowStock = allInsumos.filter(
+    insumo => insumo.stockActual <= insumo.stockMinimo
+  ).length
 
   return {
     totalLotes,

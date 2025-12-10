@@ -18,6 +18,7 @@ import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { EstadoLote } from '@/types/prisma'
 
 async function getProduccionStats() {
   const now = new Date()
@@ -40,13 +41,13 @@ async function getProduccionStats() {
     prisma.lote.count(),
 
     // Lotes en producción
-    prisma.lote.count({ where: { estado: 'PRODUCCION' } }),
+    prisma.lote.count({ where: { estado: EstadoLote.PRODUCCION } }),
 
     // Lotes disponibles
-    prisma.lote.count({ where: { estado: 'DISPONIBLE' } }),
+    prisma.lote.count({ where: { estado: EstadoLote.DISPONIBLE } }),
 
     // Lotes vendidos
-    prisma.lote.count({ where: { estado: 'VENDIDO' } }),
+    prisma.lote.count({ where: { estado: EstadoLote.VENDIDO } }),
 
     // Producción del mes actual
     prisma.lote.aggregate({
