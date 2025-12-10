@@ -84,13 +84,6 @@ export function Sidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
   
-  interface User {
-  name?: string | null | undefined;
-  email?: string | null | undefined;
-  image?: string | null | undefined;
-  role?: string;
-}
-
 const userRole = (session?.user as User)?.role;
 
   const filteredNavigation = navigation.filter(item =>

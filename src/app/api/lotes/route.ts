@@ -103,19 +103,19 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validatedData = loteSchema.parse(body)
 
-    // Verificar que el código sea único
-    const existingLote = await prisma.lote.findFirst({
-      where: { codigo: validatedData.codigo }
-    })
-
-    if (existingLote) {
-      // Generar un nuevo código único
-      validatedData.codigo = `LOTE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    }
+    // Generar un código único basado en fecha y contador
+    const today = new Date()
+    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
+    const timeStr = Date.now().toString().slice(-6)
+    const uniqueCode = `LOTE-${dateStr}-${timeStr}`
+    
+    // Asignar el código generado (o usar el del validatedData si existe)
+    const codigoFinal = validatedData.codigo || uniqueCode
 
     const lote = await prisma.lote.create({
       data: {
         ...validatedData,
+        codigo: codigoFinal,
         estado: 'PRODUCCION'
       },
       include: {

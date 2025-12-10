@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Download, FileText, Table, Loader2 } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { ReportExporter } from '@/lib/exporters'
 
 // Interfaces para los diferentes tipos de datos
@@ -86,83 +86,18 @@ export function ExportButton({ data, filename, type, buttonText = 'Exportar', bu
     return new Date(date).toLocaleDateString('es-CO')
   }
 
-  const formatLotesData = (lotes: Lote[]): ReportData => {
-    return {
-      title: 'Reporte de Lotes de Panela',
-      headers: ['Código', 'Cantidad (kg)', 'Fecha Producción', 'Estado', 'Costo Total', 'Precio Sugerido', 'Descripción'],
-      rows: lotes.map(lote => [
-        lote.codigo,
-        lote.cantidad,
-        formatDate(lote.fechaProduccion),
-        lote.estado,
-        formatCurrency(lote.costoTotal),
-        formatCurrency(lote.precioSugerido),
-        lote.descripcion || 'N/A'
-      ]),
-      filename: `lotes_${new Date().toISOString().split('T')[0]}`
-    }
-  }
-
-  const formatProveedoresData = (proveedores: Proveedor[]): ReportData => {
-    return {
-      title: 'Reporte de Proveedores',
-      headers: ['Nombre', 'Contacto', 'Teléfono', 'Email', 'Dirección', 'Estado', 'Fecha Registro'],
-      rows: proveedores.map(proveedor => [
-        proveedor.nombre,
-        proveedor.contacto || 'N/A',
-        proveedor.telefono || 'N/A',
-        proveedor.email || 'N/A',
-        proveedor.direccion || 'N/A',
-        proveedor.activo ? 'Activo' : 'Inactivo',
-        formatDate(proveedor.createdAt)
-      ]),
-      filename: `proveedores_${new Date().toISOString().split('T')[0]}`
-    }
-  }
-
-  const formatInsumosData = (insumos: Insumo[]): ReportData => {
-    return {
-      title: 'Reporte de Insumos',
-      headers: ['Nombre', 'Descripción', 'Unidad', 'Stock Actual', 'Stock Mínimo', 'Costo Unitario', 'Estado'],
-      rows: insumos.map(insumo => [
-        insumo.nombre,
-        insumo.descripcion || 'N/A',
-        insumo.unidadMedida,
-        insumo.stockActual,
-        insumo.stockMinimo,
-        formatCurrency(insumo.costoUnitario),
-        insumo.activo ? 'Activo' : 'Inactivo'
-      ]),
-      filename: `insumos_${new Date().toISOString().split('T')[0]}`
-    }
-  }
-
-  const formatVentasData = (ventas: Venta[]): ReportData => {
-    return {
-      title: 'Reporte de Ventas',
-      headers: ['Código Lote', 'Cantidad (kg)', 'Precio Unitario', 'Total', 'Cliente', 'Fecha'],
-      rows: ventas.map(venta => [
-        venta.lote.codigo,
-        venta.cantidad,
-        formatCurrency(venta.precioUnitario),
-        formatCurrency(venta.total),
-        venta.cliente || 'N/A',
-        formatDate(venta.fecha)
-      ]),
-      filename: `ventas_${new Date().toISOString().split('T')[0]}`
-    }
-  }
-
   const getReportData = (): ReportData => {
     switch (type) {
       case 'lotes':
-        return formatLotesData(data as Lote[])
+        return ReportExporter.formatLotesData(data as any)
       case 'proveedores':
-        return formatProveedoresData(data as Proveedor[])
+        return ReportExporter.formatProveedoresData(data as any)
       case 'insumos':
-        return formatInsumosData(data as Insumo[])
+        return ReportExporter.formatInsumosData(data as any)
       case 'ventas':
-        return formatVentasData(data as Venta[])
+        return ReportExporter.formatVentasData(data as any)
+      case 'compras':
+        return ReportExporter.formatComprasData(data as any)
       default:
         throw new Error(`Tipo de reporte no soportado: ${type}`)
     }
